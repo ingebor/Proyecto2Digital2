@@ -2,6 +2,15 @@
 #include <SPI.h>
 #include <SD.h>
 
+// define your pitch constants
+// these will be notes that can be used to make a song
+
+
+#define NOTE_C4  262
+#define NOTE_A6  1760
+#define NOTE_C5  523
+#define NOTE_C7  2093
+
 //Variables globales
 const int buttonPin2 = 17;
 const int buttonPin1 = 31;
@@ -14,6 +23,17 @@ String temp = "";
 String hum = "";
 File archivo;
 String enviarArchivo = "";
+int buzzerPin = 19;
+
+int melody[] = {
+  NOTE_C4,NOTE_C5,NOTE_A6,NOTE_C7
+};
+int noteDurations[] = {
+  4,4,4,4
+};
+int melody2[] = {
+  NOTE_C7,NOTE_A6,NOTE_C5,NOTE_C4
+};
 
 //Configuracion
 void setup() {
@@ -22,6 +42,7 @@ void setup() {
   Serial2.begin(115200);
   pinMode(buttonPin2, INPUT_PULLUP);
   pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buzzerPin, OUTPUT); // set buzzerPin to OUTPUT
 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
@@ -56,6 +77,18 @@ void loop() {
     Serial2.println("m");
     delay(300);
     presionado2 = 0;
+    for (int thisNote = 0; thisNote < 4; thisNote++) {
+
+    // to calculate the note duration, take one second divided by the
+    // note type. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    int noteDuration = 1000/noteDurations[thisNote];
+    tone(buzzerPin, melody[thisNote], noteDuration);
+
+    int pauseBetweenNotes = noteDuration + 50; // delay between pulse
+    delay(pauseBetweenNotes);
+
+    noTone(buzzerPin); // stop the tone playing
+  }
   }
 
   //Leer valores de temperatura y humedad
@@ -84,6 +117,19 @@ void loop() {
   if(buttonState1 == 1 && presionado1 == 1){
     archivo = SD.open("proyecto.txt", FILE_WRITE);
     if(archivo){
+      for (int thisNote = 0; thisNote < 4; thisNote++) {
+
+        // to calculate the note duration, take one second divided by the
+        // note type. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+        int noteDuration = 1000/noteDurations[thisNote];
+        tone(buzzerPin, melody2[thisNote], noteDuration);
+    
+        int pauseBetweenNotes = noteDuration + 50; // delay between pulse
+        delay(pauseBetweenNotes);
+    
+        noTone(buzzerPin); // stop the tone playing
+        
+      }
       Serial.println("Subiendo a SD: ");
       Serial.println(enviarArchivo);
       archivo.println(enviarArchivo);
