@@ -23,7 +23,7 @@ String temp = "";
 String hum = "";
 File archivo;
 String enviarArchivo = "";
-int buzzerPin = 19;
+int buzzerPin = 37;
 
 int melody[] = {
   NOTE_C4,NOTE_C5,NOTE_A6,NOTE_C7
