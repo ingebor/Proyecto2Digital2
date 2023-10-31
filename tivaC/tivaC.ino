@@ -195,10 +195,10 @@ void loop() {
    tempFloat = temp.toFloat();
    Serial.println("Temperatura en float: ");
    Serial.println(tempFloat);
-   if (tempFloat > 26.00){
+   if (tempFloat > 26.50){
     FillRect(35, 70, 150, 20, 0xF924);
    }
-   else if (tempFloat<26.00 && tempFloat > 25.80){
+   else if (tempFloat<26.50 && tempFloat > 25.80){
     FillRect(35, 70, 150, 20, 0x5FAB);
    }
    else if (tempFloat<25.80){
