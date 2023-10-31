@@ -1,3 +1,9 @@
+//Universidad del Valle de Guatemala
+//Ingebor Ayleen Rubio Vasquez
+//19003
+//Electrónica Digital 2
+//Proyecto No 2
+
 //Librerias
 #include <SPI.h>
 #include <SD.h>
@@ -46,6 +52,8 @@ String hum = "";
 File archivo;
 String enviarArchivo = "";
 int buzzerPin = 37;
+float tempFloat = 0.00;
+float humFloat = 0.00;
 
 int melody[] = {
   NOTE_C4,NOTE_C5,NOTE_A6,NOTE_C7
@@ -75,7 +83,8 @@ void LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int
 void LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
 
 
-extern uint8_t fondo[];
+extern uint8_t humedad[];
+extern uint8_t termometro[];
 
 //Configuracion
 void setup() {
@@ -112,14 +121,20 @@ void setup() {
   LCD_Init();
   LCD_Clear(0xffff); //00 es negro, 0xffff es blanco
   
-  //FillRect(0, 0, 320, 240, 0x421b);
-  String text1 = "Temperatura:";
-  LCD_Print(text1, 20, 100, 2, 0x00, 0x421b);
-//LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
+  FillRect(35, 70, 150, 20, 0xF47C);
+  String text1 = "Temperatura";
+  //String text2 = "Esperando datos...";
+  String text3 = "Humedad";
+  LCD_Print(text1, 5, 45, 2, 0x00,0xffff);
+  //LCD_Print(text2, 45, 75, 1.99, 0x00,0xffff);
+  LCD_Print(text3, 135, 160, 2, 0x00,0xffff);
+  //LCD_Print(text2, 155, 190, 1.99, 0x00,0xffff);
+  //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
     
   //LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
-  LCD_Bitmap(0, 208, 32, 32, temperatura);
-  LCD_Bitmap(0,0,32,32,humedad);
+  //LCD_Bitmap(0, 0, 320, 240, planta);
+  LCD_Bitmap(200, 0, 120, 120, termometro);
+  LCD_Bitmap(0,120,120,120, humedad);
   
   /*for(int x = 0; x <319; x++){
     LCD_Bitmap(x, 52, 16, 16, tile2);
@@ -175,9 +190,26 @@ void loop() {
     hum = inByte.substring(6,11);
     enviarArchivo = inByte;
    inByte = "";
+   temp = temp+"*C";
+   hum = hum+"%";
+   tempFloat = temp.toFloat();
+   Serial.println("Temperatura en float: ");
+   Serial.println(tempFloat);
+   if (tempFloat > 26.00){
+    FillRect(35, 70, 150, 20, 0xF924);
+   }
+   else if (tempFloat<26.00 && tempFloat > 25.80){
+    FillRect(35, 70, 150, 20, 0x5FAB);
+   }
+   else if (tempFloat<25.80){
+    FillRect(35, 70, 150, 20, 0x57BC);
+   }
    Serial.println(temp);
+   LCD_Print(temp, 80, 75, 1.99, 0x00,0xffff);
    Serial.println(hum);
+   LCD_Print(hum, 155, 190, 1.99, 0x00,0xffff);
    delay(300);
+   
   }
 
   //Presionsar boton para almacenar en la SD
