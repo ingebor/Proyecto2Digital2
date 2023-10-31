@@ -94,7 +94,7 @@ void setup() {
   pinMode(buttonPin2, INPUT_PULLUP);
   pinMode(buttonPin1, INPUT_PULLUP);
   pinMode(buzzerPin, OUTPUT); // set buzzerPin to OUTPUT
-
+  //configurar SD
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
@@ -121,35 +121,22 @@ void setup() {
   LCD_Init();
   LCD_Clear(0xffff); //00 es negro, 0xffff es blanco
   
+  //Mostrar mensajes e imágenes iniciales en la LCD
   FillRect(35, 70, 150, 20, 0xF47C);
   String text1 = "Temperatura";
-  //String text2 = "Esperando datos...";
   String text3 = "Humedad";
   LCD_Print(text1, 5, 45, 2, 0x00,0xffff);
-  //LCD_Print(text2, 45, 75, 1.99, 0x00,0xffff);
   LCD_Print(text3, 135, 160, 2, 0x00,0xffff);
-  //LCD_Print(text2, 155, 190, 1.99, 0x00,0xffff);
   //LCD_Sprite(int x, int y, int width, int height, unsigned char bitmap[],int columns, int index, char flip, char offset);
     
   //LCD_Bitmap(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char bitmap[]);
-  //LCD_Bitmap(0, 0, 320, 240, planta);
   LCD_Bitmap(200, 0, 120, 120, termometro);
   LCD_Bitmap(0,120,120,120, humedad);
-  
-  /*for(int x = 0; x <319; x++){
-    LCD_Bitmap(x, 52, 16, 16, tile2);
-    LCD_Bitmap(x, 68, 16, 16, tile);
-    
-    LCD_Bitmap(x, 207, 16, 16, tile);
-    LCD_Bitmap(x, 223, 16, 16, tile);
-    x += 15;
- }*/
-  
-  
+
 }
 
 void loop() {
-  // read from port 1, send to port 0:
+  // Obtener valores de los botones
   buttonState2 = digitalRead(buttonPin2);
   buttonState1 = digitalRead(buttonPin1);
 
@@ -162,6 +149,7 @@ void loop() {
     Serial2.println("m");
     delay(300);
     presionado2 = 0;
+    //Reproducir melodia de buzzer
     for (int thisNote = 0; thisNote < 4; thisNote++) {
 
     // to calculate the note duration, take one second divided by the
@@ -186,29 +174,34 @@ void loop() {
   }
   if(inByte.length()>0){
     Serial.println(inByte);
+    //Separar valores
     temp = inByte.substring(0,5);
     hum = inByte.substring(6,11);
+    //Variable en la que se almacenarán los datos para poder enviar a la SD
     enviarArchivo = inByte;
-   inByte = "";
-   temp = temp+"*C";
-   hum = hum+"%";
-   tempFloat = temp.toFloat();
-   Serial.println("Temperatura en float: ");
-   Serial.println(tempFloat);
-   if (tempFloat > 26.50){
-    FillRect(35, 70, 150, 20, 0xF924);
-   }
-   else if (tempFloat<26.50 && tempFloat > 25.80){
-    FillRect(35, 70, 150, 20, 0x5FAB);
-   }
-   else if (tempFloat<25.80){
-    FillRect(35, 70, 150, 20, 0x57BC);
-   }
-   Serial.println(temp);
-   LCD_Print(temp, 80, 75, 1.99, 0x00,0xffff);
-   Serial.println(hum);
-   LCD_Print(hum, 155, 190, 1.99, 0x00,0xffff);
-   delay(300);
+    //Reiniciar variable para volver a recibir datos
+
+    //Preparar variables para mostrarlas en pantalla
+     inByte = "";
+     temp = temp+"*C";
+     hum = hum+"%";
+     tempFloat = temp.toFloat();
+     Serial.println("Temperatura en float: ");
+     Serial.println(tempFloat);
+     if (tempFloat > 26.50){
+      FillRect(35, 70, 150, 20, 0xF924);
+     }
+     else if (tempFloat<26.50 && tempFloat > 25.80){
+      FillRect(35, 70, 150, 20, 0x5FAB);
+     }
+     else if (tempFloat<25.80){
+      FillRect(35, 70, 150, 20, 0x57BC);
+     }
+     Serial.println(temp);
+     LCD_Print(temp, 80, 75, 1.99, 0x00,0xffff);
+     Serial.println(hum);
+     LCD_Print(hum, 155, 190, 1.99, 0x00,0xffff);
+     delay(300);
    
   }
 
@@ -219,8 +212,8 @@ void loop() {
   if(buttonState1 == 1 && presionado1 == 1){
     archivo = SD.open("proyecto.txt", FILE_WRITE);
     if(archivo){
+      //Melodia buzzer
       for (int thisNote = 0; thisNote < 4; thisNote++) {
-
         // to calculate the note duration, take one second divided by the
         // note type. quarter note = 1000 / 4, eighth note = 1000/8, etc.
         int noteDuration = 1000/noteDurations[thisNote];
@@ -232,6 +225,7 @@ void loop() {
         noTone(buzzerPin); // stop the tone playing
         
       }
+      //Subir datos a SD
       Serial.println("Subiendo a SD: ");
       Serial.println(enviarArchivo);
       archivo.println(enviarArchivo);
